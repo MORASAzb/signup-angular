@@ -1,0 +1,431 @@
+<div class="h-[100vh] flex flex-row justify-between w-[100%]">
+
+    <!--navbar-->
+
+    <nav class="bg-[#091834] text-white h-[100%] px-8 sticky right-0 top-0">
+        <div>
+            <section class="py-5 mb-3 font-bold text-center border-b-2">وضعیت ثبت نام</section>
+            <ul>
+                <mat-list role="list">
+                    <mat-list-item role="listitem" *ngFor="let item of items" (click)="toggleComplete(item)"
+                        class="item-container">
+                        <span class="icon" [ngClass]="{'completed': item.completed}">
+                            <mat-icon class="icon">{{ item.completed ? 'check_circle' :
+                                'radio_button_unchecked'}}</mat-icon>
+                        </span>
+                        <p>{{ item.text }}</p>
+                    </mat-list-item>
+                </mat-list>
+            </ul>
+        </div>
+    </nav>
+
+
+    <!-- Card -->
+    <mat-card class="flex flex-col items-center justify-center flex-1 bg-garay-400">
+        <div class="p-5 border-2 rounded-lg">
+            <mat-card-header>
+                <p class="mb-8"><strong>ثبت نام -</strong> {{selectedItemText}}</p>
+            </mat-card-header>
+            <mat-card-content>
+                <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()" class="flex flex-col items-center w-[60vw]">
+                    <!--select type-->
+                    <div class="flex flex-col w-full space-x-4 text-sm">
+                        <label class="block mb-2 font-bold text-gray-700">نوع شخص *</label>
+                        <div class="grid grid-cols-2 gap-y-3 place-items-center">
+                            <button *ngFor="let type of personTypes" class="py-3 rounded-lg border-2 w-[70%]"
+                                type="button" [ngClass]="{
+                                'bg-blue-700 text-white': personType === type.value, 
+                                'bg-bg-gray-300': personType !== type.value 
+                            }" (click)="setPersonType(type.value)">
+                                {{ type.label }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Forms -->
+                    <div>
+                        <!-- Iranians Form -->
+                        <div *ngIf="personType === 'individual' && individualType === 'iranian'"
+                            class="grid grid-cols-3 grid-rows-3 mt-8 gap-x-3 ">
+
+                            <!--کد  ملی-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> کد ملی </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" type="number" matInput
+                                        placeholder="کد ملی" formControlName="nationalCode" required>
+                                    <mat-error
+                                        *ngIf="isSubmitted && signUpForm.controls['nationalCode'].hasError('required')">
+                                        کد ملی الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--تاریخ تولد-->
+                            <span class="flex flex-col">
+                                <mat-form-field appearance="fill" class="w-full m-0">
+                                    <mat-label class="text-sm"> تاریخ تولد </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        [matDatepicker]="picker" placeholder="1360/06/21" formControlName="date1"
+                                        required>
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['date1'].hasError('required')">
+                                        تاریخ تولد الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="flex items-center text-sm text-gray-500 ">
+                                    <mat-icon class="mr-1">info</mat-icon>
+                                    <span>سن مودی باید بیشتر از 18 سال باشد</span>
+                                </div>
+                            </span>
+
+                            <!--موبایل-->
+                            <span class="flex flex-col">
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> شماره همراه مودی </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput type="number"
+                                        placeholder="09123456789"  formControlName="phone" value="phone">
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['phone'].hasError('required')">
+                                        شماره همراه الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="flex items-center text-sm text-gray-500 ">
+                                    <mat-icon class="mr-1">info</mat-icon>
+                                    <span>کد ملی باید با شماره همراه مطابقت داشته باشد</span>
+                                </div>
+                            </span>
+
+                            <!--نام-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0">
+                                    <mat-label class="text-sm">نام</mat-label>
+                                    <input  class="placeholder:text-sm placeholder:text-black" matInput placeholder="نام"
+                                        disabled  class="p-0">
+                                </mat-form-field>
+                            </span>
+
+                            <!--فامیلی-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm">نام خانوادگی</mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        placeholder="نام خانوادگی" disabled >
+                                </mat-form-field>
+                            </span>
+
+                            <!--  نام پدر-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0">
+                                    <mat-label class="text-sm"> نام پدر</mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        placeholder=" نام پدر" disabled   class="p-0">
+                                </mat-form-field>
+                            </span>
+
+                            <!-- <div *ngIf="userInfo" class="mt-4">
+                                <p>نام: {{ userInfo.firstName }}</p>
+                                <p>نام خانوادگی: {{ userInfo.lastName }}</p>
+                                <p>نام پدر: {{ userInfo.fatherName }}</p>
+                            </div> -->
+                        </div>
+
+                        <!-- Non-Iranians Form -->
+                        <div *ngIf="personType === 'nonIranian'" class="grid grid-cols-3 grid-rows-3 mt-8 gap-x-3">
+
+                            <!--نام-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm">نام</mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput placeholder="نام"
+                                        formControlName="name" required class="p-0">
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['name'].hasError('required')">
+                                        نام الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--فامیلی-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm">نام خانوادگی</mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        placeholder="نام خانوادگی" formControlName="lastName" required>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['name'].hasError('required')">
+                                        نام خانوادگی الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--کد  ملی-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> کد اتباع </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" type="number" matInput
+                                        placeholder="کد اتباع" formControlName="nationalCode" required>
+                                    <mat-error
+                                        *ngIf="isSubmitted && signUpForm.controls['nationalCode'].hasError('required')">
+                                        کد اتباع الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--تاریخ تولد-->
+                            <!-- <span class="flex flex-col">
+                                <mat-form-field appearance="fill" class="w-full m-0">
+                                    <mat-label class="text-sm"> تاریخ تولد </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        [matDatepicker]="picker" placeholder="1360/06/21" formControlName="date2"
+                                        required>
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['date2'].hasError('required')">
+                                        تاریخ تولد الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="flex items-center text-sm text-gray-500 ">
+                                    <mat-icon class="mr-1">info</mat-icon>
+                                    <span>سن مودی باید بیشتر از 18 سال باشد</span>
+                                </div>
+                            </span> -->
+
+                            <!--موبایل-->
+                            <span class="flex flex-col">
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> شماره همراه مودی </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput type="number"
+                                        placeholder="09123456789" maxlength="11" formControlName="phone" required>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['phone'].hasError('required')">
+                                        شماره همراه الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="flex items-center text-sm text-gray-500 ">
+                                    <mat-icon class="mr-1">info</mat-icon>
+                                    <span>کد ملی باید با شماره همراه مطابقت داشته باشد</span>
+                                </div>
+                            </span>
+                        </div>
+
+                        <!-- Civil Partnership Form -->
+                        <div *ngIf="personType === 'civilPartnership'"
+                            class="grid grid-cols-3 grid-rows-3 mt-8 gap-x-3">
+
+                            <!--نام-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> نام نماینده</mat-label>
+                                    <input class="rounded-lg placeholder:text-sm placeholder:text-black" matInput
+                                        placeholder="نام نماینده" formControlName="name" required class="p-0">
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['name'].hasError('required')">
+                                        نام الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--فامیلی-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm">نام خانوادگی</mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        placeholder=" نام خانوادگی نماینده" formControlName="lastName" required>
+                                    <mat-error
+                                        *ngIf="isSubmitted && signUpForm.controls['lastName'].hasError('required')">
+                                        نام خانوادگی الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!-- شناسه مشارکت مدنی-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> شناسه مشارکت مدنی </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput type="number"
+                                        placeholder="شناسه مشارکت مدنی" formControlName="identifier" required>
+                                    <mat-error
+                                        *ngIf="isSubmitted && signUpForm.controls['identifier'].hasError('required')">
+                                        شناسه مشارکت مدنی الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--کد  ملی-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> کد ملی/کد اتباع مودی </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" type="number" matInput
+                                        placeholder="کد ملی/کد اتباع مودی" formControlName="nationalCode" required>
+                                    <mat-error
+                                        *ngIf="isSubmitted && signUpForm.controls['nationalCode'].hasError('required')">
+                                        کد ملی/کد اتباع مودی الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--تجاری نام-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> نام تجاری</mat-label>
+                                    <input class="rounded-lg placeholder:text-sm placeholder:text-black" matInput
+                                        placeholder="نام تجاری" formControlName="brandName" required class="p-0">
+                                    <mat-error
+                                        *ngIf="isSubmitted && signUpForm.controls['brandName'].hasError('required')">
+                                        نام تجاری الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--تاریخ تولد-->
+                            <span class="flex flex-col">
+                                <mat-form-field appearance="fill" class="w-full m-0">
+                                    <mat-label class="text-sm"> تاریخ تولد نماینده </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        [matDatepicker]="picker" placeholder="1360/06/21" formControlName="date3"
+                                        required>
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['date3'].hasError('required')">
+                                        تاریخ تولد الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="flex items-center text-sm text-gray-500 ">
+                                    <mat-icon class="mr-1">info</mat-icon>
+                                    <span>سن مودی باید بیشتر از 18 سال باشد</span>
+                                </div>
+                            </span>
+
+                            <!--موبایل-->
+                            <span class="flex flex-col">
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> شماره همراه مودی </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput type="number"
+                                        placeholder="09123456789" maxlength="11" formControlName="phone" required>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['phone'].hasError('required')">
+                                        شماره همراه الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="flex items-center text-sm text-gray-500 ">
+                                    <mat-icon class="mr-1">info</mat-icon>
+                                    <span>کد ملی باید با شماره همراه مطابقت داشته باشد</span>
+                                </div>
+                            </span>
+
+
+                        </div>
+
+                        <!-- Legal Form -->
+                        <div *ngIf="personType === 'legal'" class="grid grid-cols-3 grid-rows-3 mt-8 gap-x-3">
+
+                            <!-- نام تجاری-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0">
+                                    <mat-label class="text-sm"> نام تجاری </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        placeholder="نام تجاری" formControlName="name" required class="p-0">
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['name'].hasError('required')">
+                                        نام تجاری الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--شناسه شرکت-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> شناسه شرکت/سازمان </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput type="number"
+                                        placeholder="شناسه شرکت/سازمان" formControlName="identifier" required>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['phone'].hasError('required')">
+                                        شناسه شرکت الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--نام-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0">
+                                    <mat-label class="text-sm">نام</mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput placeholder="نام"
+                                        formControlName="name" required class="p-0">
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['name'].hasError('required')">
+                                        نام الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--فامیلی-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm">نام خانوادگی</mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        placeholder="نام خانوادگی" formControlName="lastName" required>
+                                    <mat-error
+                                        *ngIf="isSubmitted && signUpForm.controls['lastName'].hasError('required')">
+                                        نام خانوادگی الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+
+                            <!-- کد ملی مدیرعامل-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> کد ملی مدیر عامل/ رئیس شرکت </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput type="number"
+                                        placeholder=" کد ملی مدیر عامل/ رئیس شرکت" formControlName="nationalCode"
+                                        required>
+                                    <mat-error
+                                        *ngIf="isSubmitted && signUpForm.controls['nationalCode'].hasError('required')">
+                                        کد ملی مدیرعامل/ رئیس شرکت الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                            </span>
+
+                            <!--تاریخ تولد-->
+                            <span>
+                                <mat-form-field appearance="fill" class="w-full m-0">
+                                    <mat-label class="text-sm"> تاریخ تولد </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput
+                                        [matDatepicker]="picker" placeholder="1360/06/21" formControlName="date4"
+                                        required>
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['date4'].hasError('required')">
+                                        تاریخ تولد الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="flex items-center text-sm text-gray-500 ">
+                                    <mat-icon class="mr-1">info</mat-icon>
+                                    <span>سن مودی باید بیشتر از 18 سال باشد</span>
+                                </div>
+                            </span>
+
+                            <!--موبایل-->
+                            <span class="flex flex-col">
+                                <mat-form-field appearance="fill" class="w-full p-0 m-0">
+                                    <mat-label class="text-sm"> شماره همراه مدیرعامل </mat-label>
+                                    <input class="placeholder:text-sm placeholder:text-black" matInput type="number"
+                                        placeholder="09123456789" maxlength="11" formControlName="phone" required>
+                                    <mat-error *ngIf="isSubmitted && signUpForm.controls['phone'].hasError('required')">
+                                        شماره همراه الزامی است
+                                    </mat-error>
+                                </mat-form-field>
+                                <div class="flex items-center text-sm text-gray-500 ">
+                                    <mat-icon class="mr-1">info</mat-icon>
+                                    <span>کد ملی باید با شماره همراه مطابقت داشته باشد</span>
+                                </div>
+                            </span>
+
+
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between w-full mt-4">
+                        <button mat-stroked-button disabled >مرحله قبلی</button>
+                        <button mat-stroked-button> ثبت</button>
+                    </div>
+                </form>
+
+            </mat-card-content>
+        </div>
+    </mat-card>
+</div>
